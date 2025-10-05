@@ -1,0 +1,58 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% block content %}
+<form method="post" id="cart-form" action="{% url 'shop:create_checkout_session' %}">
+  {% csrf_token %}
+  <div class="card mb-4">
+    <div class="card-body">
+      <h4>Products</h4>
+      <div class="row">
+        {% for p in products %}
+          <div class="col-md-4 mb-3">
+            <div class="border rounded p-3 h-100">
+              <h5>{{ p.name }}</h5>
+              <p>Price: {{ p.price_cents|floatformat:-2 }} cents ({{ p.price_cents|floatformat:-2 }})</p>
+              <label>Qty:
+                <input type="number" name="qty_{{ p.id }}" min="0" value="0" class="form-control qty-input">
+              </label>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <button id="buy-btn" class="btn btn-primary mt-3">Buy</button>
+    </div>
+  </div>
+</form>
+
+<div class="card">
+  <div class="card-body">
+    <h4>My Orders</h4>
+    {% if orders %}
+      <ul class="list-group">
+        {% for order in orders %}
+          <li class="list-group-item">
+            <strong>Order #{{ order.id }}</strong> — {{ order.status }} — {{ order.created_at }}
+            <ul>
+              {% for item in order.items.all %}
+                <li>{{ item.product.name }} x {{ item.quantity }} (₹{{ item.price_cents|floatformat:2 }})</li>
+              {% endfor %}
+            </ul>
+            <div>Total: ₹{{ order.total_cents|floatformat:"2" }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No orders yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  // Disable buy button after submit to prevent double-click
+  document.getElementById('cart-form').addEventListener('submit', function(e) {
+    var btn = document.getElementById('buy-btn');
+    btn.disabled = true;
+    btn.innerText = 'Redirecting...';
+  });
+</script>
+{% endblock %}

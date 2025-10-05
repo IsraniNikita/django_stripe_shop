@@ -1,0 +1,14 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-4">
+    <h2>Signup</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-success">Signup</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
